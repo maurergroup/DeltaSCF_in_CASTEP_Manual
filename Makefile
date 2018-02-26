@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
-GH_PAGES_SOURCES = ./ examples Makefile
+GH_PAGES_SOURCES = *.rst *.png examples Makefile
 
 gh-pages:
 	git checkout gh-pages
