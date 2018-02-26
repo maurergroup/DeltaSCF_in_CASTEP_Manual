@@ -10,7 +10,7 @@ GH_PAGES_SOURCES = *.py *.rst *.png Makefile
 
 gh-pages:
 	git checkout gh-pages
-	rm -rf $(BUILDDIR) _sources _static
+	rm -rf $(BUILDDIR) _sources _static _images
 	git checkout master $(GH_PAGES_SOURCES)
 	git reset HEAD
 	make html
