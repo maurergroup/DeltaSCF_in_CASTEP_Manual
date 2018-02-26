@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Conventional Delta-Self-Consistent-Field-DFT Calculations &mdash; DeltaSCF-CASTEP-Module  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="DeltaSCF-CASTEP-Module  documentation" href="index.html" />
+    <link rel="next" title="Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals" href="ledscf.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="ledscf.html" title="Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DeltaSCF-CASTEP-Module  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="conventional-delta-self-consistent-field-dft-calculations">
+<h1>Conventional Delta-Self-Consistent-Field-DFT Calculations<a class="headerlink" href="#conventional-delta-self-consistent-field-dft-calculations" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>In <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF-DFT we calculate electronic excited states by assuming
+a certain non-equilibrium orbital occupation and by self-consistently
+solving the Kohn-Sham equations with this excited state population.</p>
+<p>The excitation energy is then simply the energy difference between
+the ground state KS-DFT calculation and the <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF-DFT calculation:</p>
+<div class="math">
+<p><img src="_images/math/22893486ba3aa28dbe577afe892ad6ee185997ce.png" alt="\Delta E = E(\Delta SCF)-E(DFT)"/></p>
+</div><p>We therefore need to perform two calculations, the ground state
+DFT calculation and the DeltaSCF calculation. For a more detailed
+explanation, see J. Chem. Phys. 135, 224303 (2011)</p>
+<p>For the <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF calculation,
+we have to add following keyword to &lt;seed&gt;.param</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  DeltaSCF
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<p>and add following keyword in &lt;seed&gt;.deltascf</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  1
+</pre></div>
+</div>
+<div class="section" id="keywords-allowed-in-seed-deltascf">
+<h3>Keywords allowed in &lt;seed&gt;.deltascf<a class="headerlink" href="#keywords-allowed-in-seed-deltascf" title="Permalink to this headline">¶</a></h3>
+<p>In the .deltascf file, the keyword title plus colon takes exactly 23 columns (A20,3X). The
+keyword content starts after that. Lines with &#8216;#&#8217; are ignored.</p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>The number of blanks between the keywords does count!!
+The best thing is to copy and modify the example from the manual.</dd>
+</dl>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="14%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">keyword</th>
+<th class="head">multiple
+appearance</th>
+<th class="head">arguments and FORTRAN format</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>deltascf_iprint</td>
+<td>No</td>
+<td>&lt;integer I&gt;</td>
+</tr>
+<tr class="row-odd"><td>deltascf_mode</td>
+<td>No</td>
+<td>&lt;integer I&gt;, 1, 2, 3, or 4</td>
+</tr>
+<tr class="row-even"><td>deltascf_constraint</td>
+<td>Yes</td>
+<td>&lt;#state I5&gt;1X&lt;occ. F8.4&gt;1X&lt;spin I4&gt;&lt;from I4&gt;&lt;to I4&gt;</td>
+</tr>
+<tr class="row-odd"><td>overlap_cutoff</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: 0.01</td>
+</tr>
+<tr class="row-even"><td>deltascf_smearing</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: 0.01 eV</td>
+</tr>
+<tr class="row-odd"><td>deltascf_mixing</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: mix_charge_amp</td>
+</tr>
+</tbody>
+</table>
+<p>Example .deltascf file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  1
+deltascf_iprint      :  1
+# mode 1 constraints ##
+#                       band  occ  spin from_band to_band
+deltascf_constraint  :  34    0.0000  1   34   34
+deltascf_constraint  :  35    1.0000  1   35   35
+overlap_cutoff       :  0.01
+deltascf_smearing    :  0.01
+</pre></div>
+</div>
+<p>In this example, we enforce an occupation of 0.00 electrons in the
+electronic state 34, spin channel 1 and an occupation of 1.00 electrons in
+the electronic state 35, spin channel 1. the last two numbers in each line
+specify a window of states in which the corresponding state is searched if
+it changes its position between SCF cycles. In that way we can ensure that we
+constrain the correct state. deltascf_smearing is a mechanism which relaxes
+the constraints minimally to facilitate convergence. Sometimes, especially in the
+case of degenerate states, deltascf_smearing is necessary.</p>
+</div>
+</div>
+<div class="section" id="example-1-electronic-excitations-of-the-azobenzene-molecule">
+<h2>Example 1: Electronic excitations of the Azobenzene molecule<a class="headerlink" href="#example-1-electronic-excitations-of-the-azobenzene-molecule" title="Permalink to this headline">¶</a></h2>
+<p>In this example we calculate the first two electronic excited states of
+E-Azobenzene in a supercell.</p>
+<p>The required files are azo.cell, azo.param, azo.deltascf</p>
+<p><em>azo.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>task: SinglePoint
+
+%BLOCK DEVEL_CODE
+  DeltaSCF
+%ENDBLOCK DEVEL_CODE
+
+reuse: default
+
+spin_polarized : False
+cut_off_energy : 350.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 10
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : PBE
+</pre></div>
+</div>
+<p><em>azo.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+    10.0000000 0.0000000000 0.0000000000
+    0.0000000000 20.0000000 0.0000000000
+    0.0000000000 0.0000000000 10.0000000000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+C         -6.72081       -1.66625        0.00000
+C         -6.64967       -0.26964        0.00000
+C         -5.40647        0.36858       -0.00000
+C         -4.23175       -0.38857       -0.00000
+C         -4.29745       -1.78579       -0.00000
+C         -5.54882       -2.43430       -0.00000
+H         -7.68820       -2.15296        0.00000
+H         -7.55879        0.31772        0.00000
+H         -5.35348        1.44963       -0.00000
+H         -3.26966        0.10734       -0.00000
+H         -3.37789       -2.35693       -0.00000
+N         -5.65342       -3.85046       -0.00000
+N         -4.64259       -4.58194       -0.00000
+C         -4.75058       -5.99808       -0.00000
+C         -6.00434       -6.64214       -0.00000
+C         -6.07567       -8.03881       -0.00000
+C         -4.90409       -8.80053       -0.00000
+C         -3.65828       -8.16721       -0.00000
+C         -3.58139       -6.77065       -0.00000
+H         -2.61200       -6.28795       -0.00000
+H         -6.92178       -6.06761       -0.00000
+H         -7.03986       -8.53061       -0.00000
+H         -4.96168       -9.88134       -0.00000
+H         -2.75170       -8.75849       -0.00000
+%ENDBLOCK POSITIONS_ABS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 1 1 1
+</pre></div>
+</div>
+<p><em>azo.deltascf</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  1
+deltascf_iprint      :  1
+# mode 1 constraints ##
+#                       band  occ spin from_band to_band
+deltascf_constraint  :  34    0.5000  1   34   34
+deltascf_constraint  :  35    0.5000  1   35   35
+</pre></div>
+</div>
+<p>We start by calculating the total DFT ground state energy as</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Final energy, E             =  -2597.665647686     eV
+</pre></div>
+</div>
+<p>Now we reuse the calculated wavefunctions and switch
+to the DeltaSCF calculation</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  DeltaSCF
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<p>There are 68 valence electrons. Therefore,
+for this non-spin-polarized system
+the HOMO orbital is orbital no. 34.
+The LUMO is orbital no. 35.</p>
+<p>The first two excited states of azobenzene are known to be
+S1(n-&gt;pi*) and S2(pi-&gt;pi*) transitions between the HOMO and LUMO
+and the HOMO-1 and the LUMO.</p>
+<p>The corresponding constraint sequence in azo.deltascf for the S1 excitation is</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_constraint  :  34    0.5000  1   34   34
+deltascf_constraint  :  35    0.5000  1   35   35
+</pre></div>
+</div>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>When running non-spin-polarized calculations, orbital occupations range from 0 to 1.
+!!When running a spin-polarized calculation, they also range from 0 to 1, although they contain 0 to 2 electrons.
+In this (non-spin-polarized) case, if we want to transfer an electron from the HOMO(34) to LUMO(35) we
+need to enforce the occupation of both to be 0.50.</dd>
+</dl>
+<hr class="docutils" />
+<p>Feel free to increase the print level with deltascf_iprint to study
+the output in more detail.</p>
+<p>The corresponding total energy is</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Final energy, E             =  -2595.702720896     eV
+</pre></div>
+</div>
+<p>This corresponds to an S1 excitation energy of 1.96 eV.</p>
+<p>The constraint sequence for an S2 excitation is</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_constraint  :  33    0.5000  1   33   33
+deltascf_constraint  :  35    0.5000  1   35   35
+</pre></div>
+</div>
+<p>The resulting final energy is</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Final energy, E             =  -2594.762182241     eV
+</pre></div>
+</div>
+<p>The corresponding S2 excitation energy is 2.90  eV.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Conventional Delta-Self-Consistent-Field-DFT Calculations</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a><ul>
+<li><a class="reference internal" href="#keywords-allowed-in-seed-deltascf">Keywords allowed in &lt;seed&gt;.deltascf</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-1-electronic-excitations-of-the-azobenzene-molecule">Example 1: Electronic excitations of the Azobenzene molecule</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ledscf.html"
+                        title="next chapter">Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/classic.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="ledscf.html" title="Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DeltaSCF-CASTEP-Module  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2012, Reinhard Maurer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>

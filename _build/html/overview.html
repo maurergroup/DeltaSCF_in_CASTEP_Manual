@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &mdash; DeltaSCF-CASTEP-Module  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="DeltaSCF-CASTEP-Module  documentation" href="index.html" />
+    <link rel="next" title="Conventional Delta-Self-Consistent-Field-DFT Calculations" href="classic.html" />
+    <link rel="prev" title="DeltaSCF-CASTEP-Module" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="classic.html" title="Conventional Delta-Self-Consistent-Field-DFT Calculations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="DeltaSCF-CASTEP-Module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DeltaSCF-CASTEP-Module  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functionality">
+<h2>Functionality<a class="headerlink" href="#functionality" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Calculate <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF-DFT excitation energies by changing band
+occupation</li>
+<li>Constrain and occupy an orbital of a subsystem or reference system to resemble an electronic
+excitation - le <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>DSCF-DFT</li>
+<li>Put penalties onto orbitals of a subsystem in a DFT+U fashion (DFT+U(MO)). This can
+be done by enforcing idempotency (integer occupation) or by constrained DFT</li>
+<li>Generate a projection of the orbital of a subsystem on the Density-of-States (DOS)</li>
+<li>A post-processing tool (MolPDOS) generates the corresponding DOS out of
+the projection information</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p class="first">The following applies to all modes, except the <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF-DFT mode.
+Nonetheless, this runmode requires a good understanding of its limitations.</p>
+</li>
+<li><p class="first">The two systems should not be strongly geometrically or electronically
+mixed and a separation into
+general system and subsystem has to still be chemically reasonable. Otherwise
+this Ansatz breaks down. Ideally the difference can be seen as a weak
+perturbation.
+This applies for example for</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt>A molecule adsorbed at a metal surface with weak to medium hybridization</dt>
+<dd><p class="first last">, <em>e.g.</em> C<sub>6</sub>H<sub>6</sub>&#64;Au(111).</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">A particle or molecule inserted into a porous nanostructure.</p>
+</li>
+<li><p class="first">The exact same system in another electronic state, <em>e.g.</em>
+groundstate <em>vs.</em> first excited state.</p>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">The wavefunction of the subsystem has to be calculated with
+<strong>exactly</strong> the same settings (K-points, spin-polarisation, cutoff, cell size)
+as the actual system. This introduces some artificial dispersion
+for gasphase molecules, but if the cell is sufficiently large
+the effects should be small. In addition, this might be something desirable,
+for example when high coverage situations are investigated.</p>
+</li>
+<li><p class="first">At the moment, the excitation constraints only work for <em>metals_method=&#8217;DM&#8217;</em>
+and without non-local exchange, as well as spin_treatment=&#8217;scalar&#8217; or &#8216;none&#8217;.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="general-use">
+<h2>General Use<a class="headerlink" href="#general-use" title="Permalink to this headline">¶</a></h2>
+<p>The general use of this module always involves the following steps:</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>Define the subsystem and calculate the self consistent density and wave functions.</dt>
+<dd><p class="first last">This has to be supplied to the actual calculation as checkfile.
+(not for class. <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF-DFT)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>in &lt;seed&gt;.param issue one of the following, depending on what</dt>
+<dd><p class="first last">you want to do</p>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  DeltaSCF           # starts a DeltaSCF or DFT+U(MO) calculation
+  MolPDOS            # outputs MO projected DOS data
+  DeltaSCF MolPDOS   # starts a DeltaSCF calculation and outputs MOPDOS
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<ol class="arabic" start="3">
+<li><dl class="first docutils">
+<dt>Supply a &lt;seed&gt;.deltascf file that contains the necessary</dt>
+<dd><p class="first last">information for the DeltaSCF and/or MolPDOS run.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Start a singlepoint calculation. Put task: singlepoint in</dt>
+<dd><p class="first last">the &lt;seed&gt;.param file and issue</p>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span></span>castep &lt;seed&gt;
+</pre></div>
+</div>
+<ol class="arabic" start="5">
+<li><dl class="first docutils">
+<dt>Only for MolPDOS calculations: Run the MolPDOS post-processing tool.</dt>
+<dd><p class="first last">This needs a &lt;seed&gt;.molpdos input file. Herefore you issue</p>
+</dd>
+</dl>
+</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span></span>MolPDOS &lt;seed&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>This module and the corresponding post-processor are written in FORTRAN90
+and are part of CASTEP. They heavily make use of the excellent infrastructure
+of the code. The portability is therefore strongly limited.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#functionality">Functionality</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#general-use">General Use</a></li>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">DeltaSCF-CASTEP-Module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="classic.html"
+                        title="next chapter">Conventional Delta-Self-Consistent-Field-DFT Calculations</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/overview.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="classic.html" title="Conventional Delta-Self-Consistent-Field-DFT Calculations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="DeltaSCF-CASTEP-Module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DeltaSCF-CASTEP-Module  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2012, Reinhard Maurer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.6.
+    </div>
+  </body>
+</html>
