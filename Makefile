@@ -17,7 +17,7 @@ gh-pages:
 	mv -fv $(BUILDDIR)/html/* ./
 	rm -rf $(GH_PAGES_SOURCES) $(BUILDDIR) 
 	git add -A
-	git ci -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
