@@ -5,19 +5,10 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = _build
-GH_PAGES_SOURCES = *.py *.rst *.png Makefile
+BUILDDIR      = ../gh-pages 
+PDFBUILDDIR   = /tmp
+PDF           = ../manual.pdf
 
-gh-pages:
-	git checkout gh-pages
-	rm -rf $(BUILDDIR) _sources _static _images
-	git checkout master $(GH_PAGES_SOURCES)
-	git reset HEAD
-	make html
-	mv -fv $(BUILDDIR)/html/* ./
-	rm -rf $(GH_PAGES_SOURCES) $(BUILDDIR) 
-	git add -A
-	git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
