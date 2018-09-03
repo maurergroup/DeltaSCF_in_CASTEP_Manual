@@ -1,0 +1,568 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Molecular Orbital (MO) projected Density-of-States - MolPDOS &mdash; DeltaSCF-Manual 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="DeltaSCF-Manual 1.0 documentation" href="index.html" />
+    <link rel="prev" title="DFT+U(MO) - Applying potentials to arbitrary orbitals" href="dft_u.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="molecular-orbital-mo-projected-density-of-states-molpdos">
+<h1>Molecular Orbital (MO) projected Density-of-States - MolPDOS<a class="headerlink" href="#molecular-orbital-mo-projected-density-of-states-molpdos" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>This mode allows to generate projections and pDOS plots with
+respect to any molecular orbital (MO). To run it one has to
+add following keyword to &lt;seed&gt;.param</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  MolPDOS
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<p>The projection data is produced by CASTEP after the SCF task and
+is written to files called &lt;seed&gt;.molpdos_state_&lt;#&gt;_&lt;#&gt;, where the
+two numbers correspond to the number and the spin of the specified
+reference orbital from the reference checkfile.</p>
+<p>At the end of the &lt;seed&gt;.castep file the projection is commented in the
+following way:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Successfully read .deltascf file!
+              Calculating MolPDOS weights
++-------------------INPUT PARAMETERS-------------------+
+Taking band from model    gasphase
+MolPDOS state               1
+MolPDOS band  nr.           4
+MolPDOS band has spin      1
+MolPDOS state               2
+MolPDOS band  nr.           5
+MolPDOS band has spin      1
+MolPDOS state               3
+MolPDOS band  nr.           6
+MolPDOS band has spin      1
+MolPDOS state               4
+MolPDOS band  nr.           4
+MolPDOS band has spin      2
+MolPDOS state               5
+MolPDOS band  nr.           5
+MolPDOS band has spin      2
+MolPDOS state               6
+MolPDOS band  nr.           6
+MolPDOS band has spin      2
+|DeltaSCF| Reading projection data from model file gs.check
+Writing file   no.molpdos_state_4_1
+Writing file   no.molpdos_state_5_1
+Writing file   no.molpdos_state_6_1
+Writing file   no.molpdos_state_4_2
+Writing file   no.molpdos_state_5_2
+Writing file   no.molpdos_state_6_2
+</pre></div>
+</div>
+<p>These files, together with the &lt;seed&gt;.bands file can be post-processed
+with the MolPDOS program with the following command</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>MolPDOS &lt;seed&gt;
+</pre></div>
+</div>
+<p>This will write output in the &lt;seed&gt;.castep with following header.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1">#############################################</span>
+<span class="c1">#                                           #</span>
+<span class="c1">#                                           #</span>
+<span class="c1">#    MolPDOS  -CASTEP Post-processor        #</span>
+<span class="c1">#                                           #</span>
+<span class="c1">#       by   R. J. Maurer                   #</span>
+<span class="c1">#                                           #</span>
+<span class="c1">#                                           #</span>
+<span class="c1">#############################################</span>
+</pre></div>
+</div>
+<p>In addition it will write files for the total DOS (Total-DOS.dat),
+for the two spin channels if the calculation was spin polarized (Total-DOS_spin1.dat,
+Total-DOS_spin2.dat), and for the MolPDOS ( &lt;#&gt;_spin&lt;#&gt;_&lt;output_filename).
+The keywords for the .deltascf and .molpdos files can be found below.</p>
+<div class="section" id="keywords-allowed-in-seed-deltascf">
+<h3>Keywords allowed in &lt;seed&gt;.deltascf<a class="headerlink" href="#keywords-allowed-in-seed-deltascf" title="Permalink to this headline">¶</a></h3>
+<p>In the .deltascf and .molpdos files, the keyword title plus colon takes exactly 23 columns (A20,3X). The
+keyword content starts after that. Lines with &#8216;#&#8217; are ignored.</p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>The number of blanks between the keywords does count!!
+The best thing is to copy and modify the example from the manual.</dd>
+</dl>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="15%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">keyword</th>
+<th class="head">multiple
+appearance</th>
+<th class="head">arguments and FORTRAN format</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>deltascf_iprint</td>
+<td>No</td>
+<td>&lt;integer I&gt;</td>
+</tr>
+<tr class="row-odd"><td>molpdos_state</td>
+<td>Yes</td>
+<td>&lt;# of ref. state I6&gt;1X&lt;spin of ref. state I6&gt;</td>
+</tr>
+<tr class="row-even"><td>deltascf_file</td>
+<td>No</td>
+<td>&lt;string len=40 filename   without .check&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>Example .deltascf file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_iprint      :  2
+deltascf_file        :  gasphase.check
+molpdos_state        :  31     1
+molpdos_state        :  33     1
+molpdos_state        :  35     1
+molpdos_state        :  36     2
+</pre></div>
+</div>
+<p>In this example, 4 different MOs with the indices 31, 33, 35, and 36 contained
+in the wavefunction file gasphase.check are projected from the wavefunction of the
+current system.</p>
+</div>
+<div class="section" id="keywords-allowed-in-seed-molpdos">
+<h3>Keywords allowed in &lt;seed&gt;.molpdos<a class="headerlink" href="#keywords-allowed-in-seed-molpdos" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="15%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">keyword</th>
+<th class="head">multiple
+appearance</th>
+<th class="head">arguments and FORTRAN format</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>molpdos_state</td>
+<td>Yes</td>
+<td>&lt;# of ref. state I6&gt;1X&lt;spin of ref. state I6&gt;</td>
+</tr>
+<tr class="row-odd"><td>molpdos_bin_with</td>
+<td>No</td>
+<td>real number, default=0.01</td>
+</tr>
+<tr class="row-even"><td>molpdos_smearing</td>
+<td>No</td>
+<td>real number, default=0.05</td>
+</tr>
+<tr class="row-odd"><td>molpdos_scaling</td>
+<td>No</td>
+<td>real number, default=1.0, scales MolPDOSes</td>
+</tr>
+<tr class="row-even"><td>no_fermi_shift</td>
+<td>No</td>
+<td>no argument, logical, removes fermishift</td>
+</tr>
+<tr class="row-odd"><td>axis_energy_margin</td>
+<td>No</td>
+<td>real in eV default=0.0eV</td>
+</tr>
+<tr class="row-even"><td>output_filename</td>
+<td>No</td>
+<td>&lt;string len=40 filename&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>Example .molpdos file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>molpdos_state        :  34     1
+molpdos_state        :  35     1
+molpdos_state        :  36     1
+molpdos_state        :  33     1
+molpdos_bin_width    :  0.02
+molpdos_smearing     :  0.05
+molpdos_scaling      :  1.00
+axis_energy_margin   :  2.00
+output_filename      :  MolPDOS.dat
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example-4-no-molecule-on-ni-001">
+<h2>Example 4: NO molecule on Ni(001)<a class="headerlink" href="#example-4-no-molecule-on-ni-001" title="Permalink to this headline">¶</a></h2>
+<p>For this example we calculate the projected MOs of a NO molecule on a Ni(001) slab.
+In the following the required input files are:</p>
+<p>no-on-ni001.param,
+no-on-ni001.cell,
+no-on-ni001.deltascf,
+no-on-ni001.molpdos,
+gasphase.cell,
+gasphase.param,
+gasphase.check</p>
+<p><em>no-on-ni001.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  MolPDOS
+%ENDBLOCK DEVEL_CODE
+
+task: SinglePoint
+
+spin_polarized : True
+cut_off_energy : 400.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 10
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : RPBE
+</pre></div>
+</div>
+<p><em>no-on-ni001.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+    3.5240000000 0.0000000000 0.0000000000
+    0.0000000000 3.5240000000 0.0000000000
+    0.0000000000 0.0000000000 23.0000000000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+    Ni 1.762000 0.000000 1.762000
+    Ni 0.000000 1.762000 1.762000
+    Ni 0.000000 0.000000 3.524000
+    Ni 1.762000 1.762000 3.524000
+    Ni 1.762000 0.000000 5.286000
+    Ni 0.000000 1.762000 5.286000
+    N  1.7620  0.0000  7.0196
+    O  1.7620 -0.0000  8.1902
+%ENDBLOCK POSITIONS_ABS
+
+%BLOCK IONIC_CONSTRAINTS
+     1  Ni   1   1 0 0
+     2  Ni   1   0 1 0
+     3  Ni   1   0 0 1
+     4  Ni   2   1 0 0
+     5  Ni   2   0 1 0
+     6  Ni   2   0 0 1
+     7  Ni   3   1 0 0
+     8  Ni   3   0 1 0
+     9  Ni   3   0 0 1
+    10  Ni   4   1 0 0
+    11  Ni   4   0 1 0
+    12  Ni   4   0 0 1
+    13  Ni   5   1 0 0
+    14  Ni   5   0 1 0
+    15  Ni   5   0 0 1
+    16  Ni   6   1 0 0
+    17  Ni   6   0 1 0
+    18  Ni   6   0 0 1
+%ENDBLOCK IONIC_CONSTRAINTS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 2 2 1
+KPOINTS_MP_OFFSET : 0.25 0.25 0.25
+</pre></div>
+</div>
+<p><em>no-on-ni001.deltascf</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_file        :  gasphase
+molpdos_state        :  4        1
+molpdos_state        :  5        1
+molpdos_state        :  6        1
+molpdos_state        :  4        2
+molpdos_state        :  5        2
+molpdos_state        :  6        2
+</pre></div>
+</div>
+<p><em>no-on-ni001.molpdos</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>molpdos_state        :  4        1
+molpdos_state        :  5        1
+molpdos_state        :  6        1
+molpdos_state        :  4        2
+molpdos_state        :  5        2
+molpdos_state        :  6        2
+molpdos_bin_width    :  0.01
+molpdos_smearing     :  0.10
+molpdos_scaling      :  1.00
+axis_energy_margin   :  2.00
+output_filename      :  MolPDOS.dat
+</pre></div>
+</div>
+<p><em>gasphase.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+    3.5240000000 0.0000000000 0.0000000000
+    0.0000000000 3.5240000000 0.0000000000
+    0.0000000000 0.0000000000 23.0000000000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+    N  1.7620  0.0000  7.0196
+    O  1.7620 -0.0000  8.1902
+%ENDBLOCK POSITIONS_ABS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 2 2 1
+KPOINTS_MP_OFFSET : 0.25 0.25 0.25
+</pre></div>
+</div>
+<p><em>gasphase.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>task: SinglePoint
+
+spin_polarized : True
+cut_off_energy : 400.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 10
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : RPBE
+</pre></div>
+</div>
+<p>After generating gasphase.check by running CASTEP on the gasphase.param and gasphase.cell files,
+we execute CASTEP and post-process with MolPDOS. This will write x-y data files for the Total DOS, the
+separate spin channels, and the MolPDOS peaks.</p>
+<p>The following image shows the Total DOS and the two spin channels.</p>
+<a class="reference internal image-reference" href="_images/DOS1.png"><img alt="alternate text" class="align-center" src="_images/DOS1.png" style="width: 869.2px; height: 581.8px;" /></a>
+<p>The next picture shows the frontier orbitals of spin channel 1 projected
+on the total DOS. Especially the LUMO shows strong hybridization with the
+Nickel d-bands and also is partially occupied. The left scale refers to the
+total DOS, whereas the right y-scale shows the peak height of the projected MOs.</p>
+<a class="reference internal image-reference" href="_images/DOS2.png"><img alt="alternate text" class="align-center" src="_images/DOS2.png" style="width: 880.6px; height: 581.8px;" /></a>
+</div>
+<div class="section" id="example-5-putting-it-all-together-co-on-cu-100">
+<h2>Example 5: Putting it all together: CO on Cu(100)<a class="headerlink" href="#example-5-putting-it-all-together-co-on-cu-100" title="Permalink to this headline">¶</a></h2>
+<p>For this example we analyze the electronic structure of
+a CO molecule in a c(2x2) overlayer on Cu(100), before we use this
+information to calculate the correct electronic transitions.</p>
+<p>In the following, the required input files are:</p>
+<p>co-on-cu100.param,
+co-on-cu100.cell,
+co-on-cu100.deltascf,
+gasphase.cell,
+gasphase.param,
+gasphase.deltascf</p>
+<p><em>co-on-cu100.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>#%BLOCK DEVEL_CODE
+#DEVEL_CODE : DeltaSCF
+#%ENDBLOCK DEVEL_CODE
+
+#reuse: default
+task: SinglePoint
+
+spin_polarized : False
+cut_off_energy : 400.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 50
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : PBE
+</pre></div>
+</div>
+<p><em>co-on-cu100.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+0.0000000000000000 -3.6320000000000001 0.0000000000000000
+3.6320000000000001 0.0000000000000000 0.0000000000000000
+0.0000000000 0.0000000000 23.614900000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+Cu      0.02575600      -3.70271100      -7.26400000
+Cu      1.84175600      -1.88671100      -7.26400000
+Cu      0.02575600      -1.88671100      -5.44800000
+Cu      1.84175600      -3.70271100      -5.44800000
+Cu      0.02575600      -3.70271100      -3.63200000
+Cu      1.84175600      -1.88671100      -3.63200000
+Cu      0.02575600      -1.88671100      -1.81600000
+Cu      1.84175600      -3.70271100      -1.81600000
+Cu      0.02575600      -3.70271100       0.00000000
+Cu      1.84175600      -1.88671100       0.00000000
+C      0.02575600      -3.70271100       1.90000000
+O      0.02575600      -3.70271100       3.00000000
+%ENDBLOCK POSITIONS_ABS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 2 2 1
+KPOINTS_MP_OFFSET : 0.25 0.25 0.25
+</pre></div>
+</div>
+<p><em>co-on-cu100.deltascf</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_iprint      :  1
+deltascf_mode        :  3
+deltascf_file        :  gasphase.check
+deltascf_constraint  :  5     0.5000  1
+deltascf_constraint  :  6     0.5000  2
+</pre></div>
+</div>
+<p><em>gasphase.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>#reuse: default
+task: SinglePoint
+
+spin_polarized : False
+cut_off_energy : 400.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 50
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : PBE
+</pre></div>
+</div>
+<p><em>gasphase.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+0.0000000000000000 -3.6320000000000001 0.0000000000000000
+3.6320000000000001 0.0000000000000000 0.0000000000000000
+0.0000000000 0.0000000000 23.614900000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+C      0.02575600      -3.70271100       1.90000000
+O      0.02575600      -3.70271100       3.00000000
+%ENDBLOCK POSITIONS_ABS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 2 2 1
+KPOINTS_MP_OFFSET : 0.25 0.25 0.25
+</pre></div>
+</div>
+<p><em>gasphase.deltascf</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  1
+deltascf_iprint      :  1
+deltascf_constraint  :   5    0.5000  1    5    5
+deltascf_constraint  :   6    0.5000  1    6    6
+deltascf_smearing    :  0.01
+</pre></div>
+</div>
+<p>We start out by calculating the groundstate of the adsorbed molecule
+and the ground state of the gasphase molecule and by analyzing the MOlPDOS
+of CO on Cu(100).</p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>GOOD TO KNOW</strong></dt>
+<dd>If you ever forget the correct input for &lt;seed&gt;.deltascf or &lt;seed&gt;.molpdos,
+just run the MolPDOS tool without seed. The printed information is all you need!</dd>
+</dl>
+<hr class="docutils" />
+<p>TO DO</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Molecular Orbital (MO) projected Density-of-States - MolPDOS</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a><ul>
+<li><a class="reference internal" href="#keywords-allowed-in-seed-deltascf">Keywords allowed in &lt;seed&gt;.deltascf</a></li>
+<li><a class="reference internal" href="#keywords-allowed-in-seed-molpdos">Keywords allowed in &lt;seed&gt;.molpdos</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-4-no-molecule-on-ni-001">Example 4: NO molecule on Ni(001)</a></li>
+<li><a class="reference internal" href="#example-5-putting-it-all-together-co-on-cu-100">Example 5: Putting it all together: CO on Cu(100)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="dft_u.html" title="previous chapter">DFT+U(MO) - Applying potentials to arbitrary orbitals</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/molpdos.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Reinhard J. Maurer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/molpdos.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DFT+U(MO) - Applying potentials to arbitrary orbitals &mdash; DeltaSCF-Manual 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="DeltaSCF-Manual 1.0 documentation" href="index.html" />
+    <link rel="next" title="Molecular Orbital (MO) projected Density-of-States - MolPDOS" href="molpdos.html" />
+    <link rel="prev" title="Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals" href="ledscf.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="dft-u-mo-applying-potentials-to-arbitrary-orbitals">
+<h1>DFT+U(MO) - Applying potentials to arbitrary orbitals<a class="headerlink" href="#dft-u-mo-applying-potentials-to-arbitrary-orbitals" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>We can employ the molecular orbital projections we have introduced
+in the le <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF formalism to also introduce penalty potentials
+that shift specific orbitals up or down. This can be used to specify the
+HOMO-LUMO of an adsorbed molecule or to modify the level alignment with the
+metal substrate. This constraint potential can be combined with population constraints.</p>
+<p>For more details and an example application on Porphine molecules adsorbed at coinage
+metal surfaces, see J. Chem. Phys. 144, 024701 (2016).</p>
+<p>In order to use this functionality we need to put following sequence
+into the &lt;seed&gt;.param</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  DeltaSCF
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<p>and add following keyword to &lt;seed&gt;.deltascf</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  2
+</pre></div>
+</div>
+<p>In this mode we add a potential to the Hamiltonian for each defined constraint,
+which has the following form:</p>
+<div class="math">
+<p><img src="_images/math/19db32c50d87a43c82afdac07403b97bb2686216.png" alt="V_c = \frac{U}{2} \cdot|\phi_c\rangle\langle\phi_c|"/></p>
+</div><p>If we specify</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+  DeltaSCF norealCDFT
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<p>following potential is applied</p>
+<div class="math">
+<p><img src="_images/math/8d321848c9fb721aedef4726566193cc294bd68d.png" alt="V_c = \frac{U}{2} \cdot(1-2n_c)|\phi_c\rangle\langle\phi_c|"/></p>
+</div><p>Here <img class="math" src="_images/math/45296bf2159ba43c7e918fcf344b65490ff38b17.png" alt="n_c"/> is the occupation of the projected state <img class="math" src="_images/math/bdb4f4c40faa43be92aee93f8a809cde0a2568a1.png" alt="\phi_c"/>.</p>
+<p>You can find a detailed description of these potentials in Appendix D of
+&#8220;First-Principles Description of the Isomerization Dynamics of Surface-Adsorbed Molecular Switches&#8221;, <a class="reference external" href="http://mediatum.ub.tum.de/?id=1190934">Doctoral Thesis</a>, Technische Universität München, 2014</p>
+<div class="section" id="keywords-allowed-in-seed-deltascf">
+<h3>Keywords allowed in &lt;seed&gt;.deltascf<a class="headerlink" href="#keywords-allowed-in-seed-deltascf" title="Permalink to this headline">¶</a></h3>
+<p>In the .deltascf file, the keyword title plus colon takes exactly 23 columns (A20,3X). The
+keyword content starts after that. Lines with &#8216;#&#8217; are ignored.</p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>The number of blanks between the keywords does count!!
+The best thing is to copy and modify the example from the manual.</dd>
+</dl>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="14%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">keyword</th>
+<th class="head">multiple
+appearance</th>
+<th class="head">arguments and FORTRAN format</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>deltascf_iprint</td>
+<td>No</td>
+<td>&lt;integer I&gt;</td>
+</tr>
+<tr class="row-odd"><td>deltascf_file</td>
+<td>No</td>
+<td>&lt;string&gt;</td>
+</tr>
+<tr class="row-even"><td>deltascf_ldau_file</td>
+<td>No</td>
+<td>&lt;string&gt;</td>
+</tr>
+<tr class="row-odd"><td>deltascf_constraint</td>
+<td>Yes</td>
+<td>&lt;#state I5&gt;1X&lt;occ. F8.4&gt;1X&lt;spin I4&gt;1X&lt;U in ev F12.6&gt;</td>
+</tr>
+<tr class="row-even"><td>overlap_cutoff</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: 0.01</td>
+</tr>
+<tr class="row-odd"><td>deltascf_mixing</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: mix_charge_amp</td>
+</tr>
+</tbody>
+</table>
+<p>Example .deltascf file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  2
+deltascf_file        :  bla.check
+deltascf_ldau_file   :  bla2.check
+deltascf_iprint      :  1
+#mode  2 constraints   add. deltascf_excite commands##
+#                       band  occ spin    +U in eV
+deltascf_constraint  :  34    0.0000  1   -1.40
+deltascf_constraint  :  35    1.0000  2    0.70
+deltascf_excite
+
+overlap_cutoff       :  0.01
+deltascf_mixing      :  0.05
+</pre></div>
+</div>
+<p>In this example, two +U constraint potentials act on orbital no. 34 of the majority spin channel
+and orbital no. 35 of the minority spin channeltaken from the deltascf_ldau_file bla2.check.
+In addition, the occupation of orbital no. 35 taken from file deltascf_file bla.check is constrained to
+the occupation 1.000. Excitation constraints are activated by following a deltascf_constraint with
+the deltascf_excite command.</p>
+</div>
+</div>
+<div class="section" id="example-3-controlling-the-homo-lumo-gap-of-azobenzene">
+<h2>Example 3: Controlling the HOMO-LUMO gap of Azobenzene<a class="headerlink" href="#example-3-controlling-the-homo-lumo-gap-of-azobenzene" title="Permalink to this headline">¶</a></h2>
+<p>For this example we need the following files</p>
+<p>azo.param
+azo.cell
+azo.deltascf</p>
+<p><em>azo.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+    10.0000000 0.0000000000 0.0000000000
+    0.0000000000 20.0000000 0.0000000000
+    0.0000000000 0.0000000000 10.0000000000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+C         -6.72081       -1.66625        0.00000
+C         -6.64967       -0.26964        0.00000
+C         -5.40647        0.36858       -0.00000
+C         -4.23175       -0.38857       -0.00000
+C         -4.29745       -1.78579       -0.00000
+C         -5.54882       -2.43430       -0.00000
+H         -7.68820       -2.15296        0.00000
+H         -7.55879        0.31772        0.00000
+H         -5.35348        1.44963       -0.00000
+H         -3.26966        0.10734       -0.00000
+H         -3.37789       -2.35693       -0.00000
+N         -5.65342       -3.85046       -0.00000
+N         -4.64259       -4.58194       -0.00000
+C         -4.75058       -5.99808       -0.00000
+C         -6.00434       -6.64214       -0.00000
+C         -6.07567       -8.03881       -0.00000
+C         -4.90409       -8.80053       -0.00000
+C         -3.65828       -8.16721       -0.00000
+C         -3.58139       -6.77065       -0.00000
+H         -2.61200       -6.28795       -0.00000
+H         -6.92178       -6.06761       -0.00000
+H         -7.03986       -8.53061       -0.00000
+H         -4.96168       -9.88134       -0.00000
+H         -2.75170       -8.75849       -0.00000
+%ENDBLOCK POSITIONS_ABS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 1 1 1
+</pre></div>
+</div>
+<p><em>azo.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>task: SinglePoint
+
+%BLOCK DEVEL_CODE
+  DeltaSCF
+%ENDBLOCK DEVEL_CODE
+reuse: default
+
+spin_polarized : False
+cut_off_energy : 350.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 10
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : PBE
+</pre></div>
+</div>
+<p><em>azo.deltascf</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  2
+deltascf_iprint      :  1
+deltascf_file        :  bla.check
+deltascf_ldau_file   :  bla.check
+#                       band  occ spin    +U in eV
+deltascf_constraint  :  34    0.5000  1   -1.00
+#deltascf_excite
+deltascf_constraint  :  35    0.5000  1    1.00
+#deltascf_excite
+</pre></div>
+</div>
+<p>We first calculate the ground state of azobenzene and copy the corresponding wavefunction file azo.check
+to the file bla.check. We use this file for reference orbitals for +U(MO), but also for <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF
+excitation constraints. We find a HOMO-LUMO gap with PBE of 1.51 eV, which is significantly lower than the
+HOMO-LUMO gap estimated with a hybrid functional.</p>
+<p>After running the DFT+U(MO) calculation with a -1.00 eV constraint on MO 34 and a +1.00 constraint on MO 35,
+we find a HOMO-LUMO gap of 2.46 eV.</p>
+<p>If we now uncomment the deltascf_excite commands, we can apply the MO constraints and enforce excited
+state occupations that model the S1 excitation of azobenzene. The corresponding excitation energy is
+2.90 eV (compared to 1.96 eV in Example 1).</p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>This module gives a lot of freedom in combining methods and parameters.
+However, only few combinations are physically sensible.</dd>
+</dl>
+<hr class="docutils" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DFT+U(MO) - Applying potentials to arbitrary orbitals</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a><ul>
+<li><a class="reference internal" href="#keywords-allowed-in-seed-deltascf">Keywords allowed in &lt;seed&gt;.deltascf</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-3-controlling-the-homo-lumo-gap-of-azobenzene">Example 3: Controlling the HOMO-LUMO gap of Azobenzene</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="ledscf.html" title="previous chapter">Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals</a></li>
+      <li>Next: <a href="molpdos.html" title="next chapter">Molecular Orbital (MO) projected Density-of-States - MolPDOS</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/dft_u.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Reinhard J. Maurer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/dft_u.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

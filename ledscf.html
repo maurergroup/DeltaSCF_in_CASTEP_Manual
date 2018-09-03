@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals &mdash; DeltaSCF-Manual 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="DeltaSCF-Manual 1.0 documentation" href="index.html" />
+    <link rel="next" title="DFT+U(MO) - Applying potentials to arbitrary orbitals" href="dft_u.html" />
+    <link rel="prev" title="Conventional Delta-Self-Consistent-Field-DFT Calculations" href="classic.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="linear-expansion-deltascf-dft-calculations-constraining-projected-reference-orbitals">
+<h1>Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals<a class="headerlink" href="#linear-expansion-deltascf-dft-calculations-constraining-projected-reference-orbitals" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>For molecules adsorbed at surfaces, <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF calculations become challenging,
+simply because of the large number of states. Not only is it difficult to identify the
+correct state, often hybridization spreads adsorbate molecular orbitals across a large
+number of substrate bands. A more realistic excitation constraint would be to project
+on a gasphase molecular orbital and subsequently enforce occupation of this state.</p>
+<p>This idea is referred to as linear expansion <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF and has first been
+proposed by Gavnholt <em>et al</em>. Phys. Rev. B 78, 075441 (2008).</p>
+<p>The here presented implementation is described in J. Chem. Phys. 139, 014708 (2013).
+Herein, we constrain the occupation of a so-called resonance state built from a linear
+combination of Kohn-Sham states instead of a single KS state. We expand an abitrary
+reference state <img class="math" src="_images/math/a2483b2941b1336cb9ec7290a979eb7e651086b8.png" alt="|\phi_c\rangle"/> in the space of Kohn-Sham states as follows:</p>
+<div class="math">
+<p><img src="_images/math/976a0c92e7118fe821a512af0e1424b5070ddae9.png" alt="|\tilde{\psi}_c^{\mathbf{k}}\rangle = \sum_i^{\mathrm{states}} |\psi_i^{\mathbf{k}}\rangle\langle\psi_i^{\mathbf{k}}|\phi_c^{\mathbf{k}} \rangle"/></p>
+</div><p>At the same time we orthogonalize the remaining KS states</p>
+<div class="math">
+<p><img src="_images/math/5d3d61720b3373e04ee5bbb5f0a2a18c6e94b930.png" alt="|\tilde{\psi_i^{\mathbf{k}}}\rangle = |\psi_i^{\mathbf{k}}\rangle - \sum_c^{\mathrm{constr.}}|\phi_c^{\mathbf{k}}\rangle\langle\phi_c^{\mathbf{k}}|\psi_i^{\mathbf{k}}\rangle"/></p>
+</div><p>After an additional orthonormalization of all states we have constructed
+a resonance state <img class="math" src="_images/math/c9bea2fc63afa15845e244ed2c1717acbd85475f.png" alt="\tilde{psi_c^{\mathbf{k}}}"/> and removed all its contributions
+from all other states. We can now constrain the occupation of this state with the effect
+of describing an excitation of a specific molecular orbital.
+This is done in every SCF step until the calculation is converged.</p>
+<p>For the le <img class="math" src="_images/math/296ab33356160c5a5d59477d3e898f58888f0bdb.png" alt="\Delta"/>SCF calculation, we have to add following keyword to &lt;seed&gt;.param</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK DEVEL_CODE
+ DeltaSCF
+%ENDBLOCK DEVEL_CODE
+</pre></div>
+</div>
+<p>and add following keyword to &lt;seed&gt;.deltascf</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  3
+</pre></div>
+</div>
+<div class="section" id="keywords-allowed-in-seed-deltascf">
+<h3>Keywords allowed in &lt;seed&gt;.deltascf<a class="headerlink" href="#keywords-allowed-in-seed-deltascf" title="Permalink to this headline">¶</a></h3>
+<p>In the .deltascf file, the keyword title plus colon takes exactly 23 columns (A20,3X). The
+keyword content starts after that. Lines with &#8216;#&#8217; are ignored.</p>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>The number of blanks between the keywords does count!!
+The best thing is to copy and modify the example from the manual.</dd>
+</dl>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="14%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">keyword</th>
+<th class="head">multiple
+appearance</th>
+<th class="head">arguments and FORTRAN format</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>deltascf_iprint</td>
+<td>No</td>
+<td>&lt;integer I&gt;</td>
+</tr>
+<tr class="row-odd"><td>deltascf_file</td>
+<td>No</td>
+<td>&lt;string&gt;</td>
+</tr>
+<tr class="row-even"><td>deltascf_constraint</td>
+<td>Yes</td>
+<td>&lt;#state I5&gt;1X&lt;occ. F8.4&gt;1X&lt;spin I4&gt;</td>
+</tr>
+<tr class="row-odd"><td>overlap_cutoff</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: 0.01</td>
+</tr>
+<tr class="row-even"><td>deltascf_mixing</td>
+<td>No</td>
+<td>&lt;float F8.4&gt;, default: mix_charge_amp</td>
+</tr>
+</tbody>
+</table>
+<p>Example .deltascf file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_mode        :  1
+deltascf_file        :  bla.check
+deltascf_iprint      :  1
+# mode 3 constraints ##
+#                       band  occ  spin
+deltascf_constraint  :  35    1.0000  1
+overlap_cutoff       :  0.01
+</pre></div>
+</div>
+<p>In this example, we take state 35 from wavefunction file bla.check
+and enforce an occupation of 1.00 electrons. In this runmode we do not
+have to pick constraints that yield a net change in charge equal to 0.
+Charge neutrality will be satisfied by modifying the Fermi level accordingly.
+However, this is only strictly sensible for metallic systems.</p>
+</div>
+</div>
+<div class="section" id="example-2-electronic-excitations-of-no-on-ni-001">
+<h2>Example 2: Electronic excitations of NO on Ni(001)<a class="headerlink" href="#example-2-electronic-excitations-of-no-on-ni-001" title="Permalink to this headline">¶</a></h2>
+<p>ATTENTION: These calculations are done using standard on-the-fly pseudopotentials
+from CASTEP-6.0.1</p>
+<p>For this example we calculate a charge neutral HOMO-&gt;LUMO excitation and
+a charge transfer excitation between a nickel substrate and a NO molecule</p>
+<p>In the following, the required input files are:</p>
+<p>no-on-ni001.param,
+no-on-ni001.cell,
+no-on-ni001.deltascf,
+gasphase.cell,
+gasphase.param,
+gasphase.check</p>
+<p><em>no-on-ni001.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>#%BLOCK DEVEL_CODE
+#DeltaSCF
+#%ENDBLOCK DEVEL_CODE
+
+#reuse: default
+task: SinglePoint
+
+spin_polarized : True
+cut_off_energy : 400.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+mix_history_length : 7
+nextra_bands : 50
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.15
+xc_functional : RPBE
+</pre></div>
+</div>
+<p><em>no-on-ni001.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+    3.5240000000 0.0000000000 0.0000000000
+    0.0000000000 3.5240000000 0.0000000000
+    0.0000000000 0.0000000000 23.0000000000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+    Ni 1.762000 0.000000 1.762000
+    Ni 0.000000 1.762000 1.762000
+    Ni 0.000000 0.000000 3.524000
+    Ni 1.762000 1.762000 3.524000
+    Ni 1.762000 0.000000 5.286000
+    Ni 0.000000 1.762000 5.286000
+    N  1.7620  0.0000  7.0196
+    O  1.7620 -0.0000  8.1902
+%ENDBLOCK POSITIONS_ABS
+
+%BLOCK IONIC_CONSTRAINTS
+     1  Ni   1   1 0 0
+     2  Ni   1   0 1 0
+     3  Ni   1   0 0 1
+     4  Ni   2   1 0 0
+     5  Ni   2   0 1 0
+     6  Ni   2   0 0 1
+     7  Ni   3   1 0 0
+     8  Ni   3   0 1 0
+     9  Ni   3   0 0 1
+    10  Ni   4   1 0 0
+    11  Ni   4   0 1 0
+    12  Ni   4   0 0 1
+    13  Ni   5   1 0 0
+    14  Ni   5   0 1 0
+    15  Ni   5   0 0 1
+    16  Ni   6   1 0 0
+    17  Ni   6   0 1 0
+    18  Ni   6   0 0 1
+%ENDBLOCK IONIC_CONSTRAINTS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 2 2 1
+KPOINTS_MP_OFFSET : 0.25 0.25 0.25
+</pre></div>
+</div>
+<p><em>no-on-ni001.deltascf</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_file        :  gasphase.check
+deltascf_iprint      :  1
+deltascf_mode        :  3
+deltascf_constraint  :  5     0.0000  1
+deltascf_constraint  :  6     1.0000  2
+</pre></div>
+</div>
+<p><em>gasphase.cell</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>%BLOCK LATTICE_CART
+    3.5240000000 0.0000000000 0.0000000000
+    0.0000000000 3.5240000000 0.0000000000
+    0.0000000000 0.0000000000 23.0000000000
+%ENDBLOCK LATTICE_CART
+
+%BLOCK POSITIONS_ABS
+    N  1.7620  0.0000  7.0196
+    O  1.7620 -0.0000  8.1902
+%ENDBLOCK POSITIONS_ABS
+
+FIX_ALL_CELL : True
+KPOINTS_MP_GRID : 2 2 1
+KPOINTS_MP_OFFSET : 0.25 0.25 0.25
+</pre></div>
+</div>
+<p><em>gasphase.param</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>task: SinglePoint
+
+spin_polarized : True
+cut_off_energy : 400.0
+elec_energy_tol : 1e-07
+fix_occupancy : False
+iprint : 1
+max_scf_cycles : 200
+metals_method : dm
+mixing_scheme : Pulay
+nextra_bands : 10
+num_dump_cycles : 0
+opt_strategy_bias : 3
+smearing_scheme : Gaussian
+smearing_width : 0.1
+xc_functional : RPBE
+</pre></div>
+</div>
+<p>The workflow is as follows:</p>
+<ul class="simple">
+<li>Calculate reference states (gasphase.check).
+These can be ground state Kohn-Sham states or themselves
+excited KS states</li>
+<li>Calculate the ground state of NO on Ni(001)</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Final energy, E             =  -7867.950085034     eV
+</pre></div>
+</div>
+<ul class="simple">
+<li>Calculate the leDeltaSCF excitation</li>
+</ul>
+<p>We calculate a charge transfer from the molecule to the surface by
+removing an electron from the HOMO in the majority spin channel</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_constraint  :  5     0.0000  1
+</pre></div>
+</div>
+<hr class="docutils" />
+<dl class="docutils">
+<dt><strong>WARNING</strong></dt>
+<dd>A sufficient number of virtual states in the calculation, controlled by the keyword nextra_states,
+is very important. The more virtual states are used explicitly,
+the more complete is the projection onto the space of KS states.
+Sometimes states are almost degenerate and we also need to constrain the occupation of
+the other state to ensure that the population doesn&#8217;t just switch between the two.
+In some cases, convergence can be very slow and a large number of SCF steps is necessary.</dd>
+</dl>
+<hr class="docutils" />
+<p>The resulting excitation energy is 0.46 eV.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Final energy, E             =  -7867.487338823     eV
+</pre></div>
+</div>
+<p>We can calculate an intramolecular triplet excitation from HOMO to LUMO with
+the following constraint sequence in &lt;seed&gt;.deltascf.
+This excites 1 electron from the HOMO in the majority spin channel
+to the LUMO in the minority spin channel.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>deltascf_constraint  :  5     0.0000  1
+deltascf_constraint  :  6     1.0000  2
+</pre></div>
+</div>
+<p>The resulting excitation energy is 9.17 eV.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Final energy, E             =  -7858.779610351     eV
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Linear expansion DeltaSCF DFT calculations - Constraining projected reference orbitals</a><ul>
+<li><a class="reference internal" href="#basics">Basics</a><ul>
+<li><a class="reference internal" href="#keywords-allowed-in-seed-deltascf">Keywords allowed in &lt;seed&gt;.deltascf</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-2-electronic-excitations-of-no-on-ni-001">Example 2: Electronic excitations of NO on Ni(001)</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="classic.html" title="previous chapter">Conventional Delta-Self-Consistent-Field-DFT Calculations</a></li>
+      <li>Next: <a href="dft_u.html" title="next chapter">DFT+U(MO) - Applying potentials to arbitrary orbitals</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ledscf.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Reinhard J. Maurer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/ledscf.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
